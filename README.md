@@ -1,20 +1,46 @@
 # 실시간 번개 모임 매칭 플랫폼, 번쩍⚡️
 
-## 📚 프로젝트 소개
+## 📌 프로젝트 소개
+
+- 팀스파르타 내일배움캠프의 실무형 Kotlin & Spring 개발자 양성과정 중 진행된 팀 프로젝트
+
+- 기간 : 2026년 01월 12일(월) ~ 02월 23일(월) (총 28일)
+  
+- 주제 : 실시간 번개 모임 매칭 플랫폼, 번쩍⚡️
+
+- 프로젝트 회고 : [✍️ velog](https://velog.io/@bella0/%EB%B2%88%EC%A9%8D-%ED%8C%80-%ED%94%84%EB%A1%9C%EC%A0%9D%ED%8A%B8-%ED%9A%8C%EA%B3%A0)
+
+- 프로젝트 정리본 : [📢 발표 자료](https://www.miricanvas.com/login?redirect=%2Fv2%2Fdesign2%2F1d92f33c-227c-4183-a39e-2b56e85bb243%3Flocation%3Ddesign%26type%3Dcopy_link%26access%3Dlink%26permission%3Dviewer)
+
+
+## 🎯 프로젝트 목표
 
 현대인들의 즉흥적이고 유연한 모임 문화를 지원하는 ***실시간 번개 모임 매칭 플랫폼, 번쩍⚡️***
 
-> **오늘 퇴근길, 갑자기 맥주 한잔하고 싶은데 부를 사람이 없네?**
+> *오늘 퇴근길, 갑자기 맥주 한잔하고 싶은데 부를 사람이 없네?*
 
 친구들과 약속 잡으려면 한 달 전부터 스케줄 조정해야 하는 피곤한 일상,
 우리는 더 이상 거창한 계획이 아닌, 지금 이 순간의 내 기분에 솔직하고 싶습니다.
 번쩍⚡️은 '약속'의 부담을 덜고, **'만남'의 설렘**만 남기고자 시작되었습니다.
 
-> **계획된 모임에서 유연한 연결로, 모임의 패러다임이 바뀝니다.**
+> *계획된 모임에서 유연한 연결로, 모임의 패러다임이 바뀝니다.*
 
 목적 중심의 동호회나 번거롭게 예약해야 하는 모임은 이제 현대인의 라이프 스타일과 맞지 않습니다.
 번쩍⚡️은 MZ세대의 **자유로운 만남 추구 문화**와 **짧고 강렬한 경험**을 선호하는 트렌드에 발맞춰,
 ’**즉흥 모임 매칭**’을 지원합니다.
+
+
+## 🛠 기술 스택
+
+- **Backend**: Java 17, Spring Boot 3.5.8, QueryDSL
+- **Database**: MySQL 8.4, MongoDB, Redis
+- **Search Engine**: Elasticsearch
+- **OpenAPI**: Kakao OAuth 2.0
+- **Monitoring**: AWS CloudWatch
+- **Test**: k6, Swagger, Mockito, JUnit5
+- **Real-Time Communication**: WebSocket, SSE
+- **CI/CD**: Docker, Github Actions
+
 
 ## ⭐ 핵심 기능
 
@@ -53,6 +79,94 @@
     - 사용자의 좋아요, 조회, 검색 로그 분석
     - 등록된 관심 카테고리 반영
     - 최근 참여 모임 패턴 학습
+
+### 추가 기능
+<details>
+  <summary><strong>1️⃣ 사용자 인증</strong></summary>
+  
+  - JWT 기반 인증
+  - 이메일 인증을 통한 회원가입 및 로그인
+  - Kakao OAuth를 통한 소셜 로그인(회원가입)
+</details>
+<details>
+  <summary><strong>2️⃣ 사용자 프로필 관리</strong></summary>
+  
+  - Presigned Url을 통한 프로필 이미지 업로드
+  - 관심 카테고리 설정
+</details>
+<details>
+  <summary><strong>3️⃣ 사용자 팔로우</strong></summary>
+
+  - 사용자 팔로우 / 언팔로우
+  - 팔로잉, 팔로워 목록 조회
+</details>
+<details>
+  <summary><strong>4️⃣ 모임 생성/수정/삭제</strong></summary>
+
+  - Presigned Url을 통한 모임 이미지 업로드
+  - 시간, 장소, 최대 참여 인원수, 카테고리 등 설정하여 모임 생성
+  - 모임의 주최자만 수정, 삭제 권한 부여
+</details>
+<details>
+  <summary><strong>5️⃣ 모임 좋아요</strong></summary>
+
+  - 모임 좋아요, 좋아요 취소
+  - 모임별 좋아요 개수 조회
+</details>
+<details>
+  <summary><strong>6️⃣ 후기</strong></summary>
+
+  - 모임 참여자에 대한 후기 작성
+  - 프로필을 통해 특정 사용자의 평균 별점 및 후기 조회 가능
+</details>
+<details>
+  <summary><strong>7️⃣ 실시간 알림</strong></summary>
+
+  - 알림 발생 상황
+    - 팔로우 중인 사용자의 새 모임 생성
+    - 내가 주최한 모임에 새 사용자 참여
+    - 내가 주최한 모임에 기존 사용자 탈퇴
+    - 모임 종료 후, 후기 작성 안내 
+  - 미확인 알림 수 실시간 카운트
+  - 최근 7일 이내의 알림만 확인 가능
+</details>
+
+## 👩🏻‍💻 담당 기능
+
+### ① 인증/인가 및 유저 CRUD
+
+기능:
+
+구현 포인트:
+
+
+### ② 모임 참여 CRUD
+
+기능 설명: 
+
+구현 포인트:
+
+
+### ③ 검색 기능
+
+기능 설명: 
+
+구현 포인트:
+
+
+### ④ 실시간 알림 기능
+
+기능:
+
+구현 포인트:
+
+
+### ⑤ 배포
+
+기능:
+
+구현 포인트:
+
 
 ## ⚙️ 프로젝트 설계
 
@@ -530,10 +644,6 @@ spring:
 </div>
 </details>
 
-
-## 🛠️ 기술 스택
-
-<img width="731" height="576" alt="스크린샷 2026-02-24 오전 9 50 47" src="https://github.com/user-attachments/assets/d57f9d15-2afc-443f-8c73-9ca9c276dd0e" />
 
 ## 🧑‍🤝‍🧑 팀원 소개
 
