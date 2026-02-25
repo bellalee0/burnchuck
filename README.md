@@ -135,37 +135,80 @@
 
 ### ① 인증/인가 및 유저 CRUD
 
-기능:
+**기능:**
 
-구현 포인트:
+- JWT 기반 인증/인가
+- 유저 프로필 조회/수정/삭제
+- 리프레시 토큰 발급 및 재발급
+
+**구현 포인트:**
+
+- Access Token + Refresh Token 이중 토큰 구조로 보안과 사용자 편의성 확보
+- 토큰 재발급 시 기존 Refresh Token 무효화(Rotation) 처리로 탈취 방지
+- 논리적 삭제(soft delete)로 탈퇴 유저 데이터 정합성 유지
 
 
 ### ② 모임 참여 CRUD
 
-기능 설명: 
+**기능:**
 
-구현 포인트:
+- 모임 참여 신청 및 취소
+- 참여 중인 모임 목록 조회
+- 참여 시 해당 모임 채팅방 자동 초대
+
+**구현 포인트:**
+
+- 참여 신청 시 정원 초과 여부 및 모임 상태(OPEN/CLOSED) 검증 후 처리
+- 참여 취소 시 모임 상태를 OPEN으로 복구하여 참여 버튼 재활성화
+- 채팅방 자동 초대 로직을 참여 트랜잭션과 함께 처리해 정합성 보장
 
 
 ### ③ 검색 기능
 
-기능 설명: 
+**기능:**
 
-구현 포인트:
+- 사용자 위치 반경 5km 이내 번개 모임 목록 조회
+- 지도 Viewport 기반 모임 조회
+- 키워드 검색, 카테고리/일정 필터링, 정렬 지원
+
+**구현 포인트:**
+
+- DB 풀스캔 → 공간 인덱스(R-Tree) → Redis GEO → Elasticsearch 4단계 고도화
+- Redis GEO는 조건이 늘어날수록 IN 절 파싱 및 PK lookup 반복으로 DB보다 느려지는 한계 확인
+- Elasticsearch 도입으로 위치(BKD Tree)·필터·키워드를 모두 인덱스에서 처리, JOIN/GROUP BY 비용 제거
+- k6 부하 테스트 기준 목록 조회 p95 13.16s → 29ms, 약 99.8% 개선, 처리량 21.6배 증가
+- ES 동기화 로직에 @Async와 Spring Event 적용으로 모임 생성 응답시간 94% 개선
+
+※ 관련 자료: [Notion 문서](https://www.notion.so/teamsparta/API-DB-Redis-Geospatial-Elasticsearch-3092dc3ef51480e3bd94d74ce79ee2dd?source=copy_link)
 
 
 ### ④ 실시간 알림 기능
 
-기능:
+**기능:**
 
-구현 포인트:
+- SSE(Server-Sent Events) 기반 실시간 알림 전송
+- 미확인 알림 수 실시간 제공
+- 팔로워 활동, 모임 참여자 안내 등 이벤트 알림
+
+**구현 포인트:**
+
+- open-in-view: false(OSIV 비활성화)로 SSE 연결 중 DB 커넥션 점유 문제 해결 → 커넥션 풀 고갈 방지
+- `@TransactionalEventListener(phase = AFTER_COMMIT)`으로 트랜잭션 커밋 이후 알림 전송 → X-Lock/S-Lock 충돌로 인한 Lock wait timeout 제거
+- Redis Pub/Sub으로 다중 서버 환경에서 SSE 관리: 이벤트 발생 시 유저 채널(channel:userId:{id})로 메시지 발행, 해당 채널을 구독한 서버의 emitter로 전달
 
 
 ### ⑤ 배포
 
-기능:
+**기능:**
 
-구현 포인트:
+- AWS 인프라 구축 및 운영
+- 운영/개발 환경 프로필 분리
+
+**구현 포인트:**
+
+- Route 53 → ALB → EC2 트래픽 라우팅, RDS(MySQL), ECR + Docker로 컨테이너 이미지 관리
+- application-dev.yml / application-prod.yml로 환경별 프로필 분리, 운영·개발 설정 독립 관리
+- 환경 변수는 별도 env 파일로 관리
 
 
 ## ⚙️ 프로젝트 설계
